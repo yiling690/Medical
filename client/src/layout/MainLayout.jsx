@@ -10,49 +10,94 @@ import useAuthStore from '../store/auth.js'
 
 const { Header, Sider, Content } = Layout
 
-const menuItems = [
-  { key: 'home', icon: <HomeOutlined />, label: '我的' },
-  { key: 'records', icon: <FileTextOutlined />, label: '我的病历' },
-  { key: 'appointments', icon: <CalendarOutlined />, label: '预约' },
-  { key: 'settings', icon: <SettingOutlined />, label: '设置' },
-]
-
 function MainLayout({ children }) {
   const navigate = useNavigate()
   const location = useLocation()
   const user = useAuthStore((state) => state.user)
   const logout = useAuthStore((state) => state.logout)
+  const isDoctor = user?.role === 'doctor'
+
+  const menuItems = isDoctor
+    ? [
+        { key: 'doctor-home', icon: <HomeOutlined />, label: '我的' },
+        { key: 'doctor-manage', icon: <FileTextOutlined />, label: '患者管理' },
+        { key: 'doctor-my-patients', icon: <FileTextOutlined />, label: '我的患者' },
+        { key: 'doctor-schedule', icon: <CalendarOutlined />, label: '日程安排' },
+        { key: 'doctor-settings', icon: <SettingOutlined />, label: '基础设置' },
+      ]
+    : [
+        { key: 'home', icon: <HomeOutlined />, label: '我的' },
+        { key: 'records', icon: <FileTextOutlined />, label: '我的病历' },
+        { key: 'appointments', icon: <CalendarOutlined />, label: '预约' },
+        { key: 'settings', icon: <SettingOutlined />, label: '设置' },
+      ]
 
   const handleMenuClick = (info) => {
-    if (info.key === 'home') {
-      navigate('/home')
-    }
-    if (info.key === 'records') {
-      navigate('/patient')
-    }
-    if (info.key === 'appointments') {
-      navigate('/appointment')
-    }
-    if (info.key === 'settings') {
-      navigate('/settings')
+    if (isDoctor) {
+      if (info.key === 'doctor-home') {
+        navigate('/doctor')
+      }
+      if (info.key === 'doctor-manage') {
+        navigate('/doctor/patient-manage')
+      }
+      if (info.key === 'doctor-my-patients') {
+        navigate('/doctor/my-patients')
+      }
+      if (info.key === 'doctor-schedule') {
+        navigate('/doctor/schedule')
+      }
+      if (info.key === 'doctor-settings') {
+        navigate('/settings')
+      }
+    } else {
+      if (info.key === 'home') {
+        navigate('/home')
+      }
+      if (info.key === 'records') {
+        navigate('/patient')
+      }
+      if (info.key === 'appointments') {
+        navigate('/appointment')
+      }
+      if (info.key === 'settings') {
+        navigate('/settings')
+      }
     }
   }
 
   const selectedKeys = []
-  if (location.pathname.startsWith('/home')) {
-    selectedKeys.push('home')
-  }
-  if (
-    location.pathname.startsWith('/patient') ||
-    location.pathname.startsWith('/records')
-  ) {
-    selectedKeys.push('records')
-  }
-  if (location.pathname.startsWith('/appointment')) {
-    selectedKeys.push('appointments')
-  }
-  if (location.pathname.startsWith('/settings')) {
-    selectedKeys.push('settings')
+  if (isDoctor) {
+    if (location.pathname === '/doctor') {
+      selectedKeys.push('doctor-home')
+    }
+    if (location.pathname.startsWith('/doctor/patient-manage')) {
+      selectedKeys.push('doctor-manage')
+    }
+    if (location.pathname.startsWith('/doctor/my-patients')) {
+      selectedKeys.push('doctor-my-patients')
+    }
+    if (location.pathname.startsWith('/doctor/schedule')) {
+      selectedKeys.push('doctor-schedule')
+    }
+    if (location.pathname.startsWith('/settings')) {
+      selectedKeys.push('doctor-settings')
+    }
+  } else {
+    if (location.pathname.startsWith('/home')) {
+      selectedKeys.push('home')
+    }
+    if (
+      location.pathname.startsWith('/patient') ||
+      location.pathname.startsWith('/records')
+    ) {
+      selectedKeys.push('records')
+    }
+    if (location.pathname.startsWith('/appointment')) {
+      selectedKeys.push('appointments')
+    }
+    if (location.pathname.startsWith('/settings')) {
+      selectedKeys.push('settings')
+    }
   }
 
   const handleLogout = () => {

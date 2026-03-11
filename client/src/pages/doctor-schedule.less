@@ -6,65 +6,68 @@
   margin-bottom: 24px;
 }
 
-.doctor-schedule-card {
+.doctor-schedule-main-card {
   height: 100%;
 }
 
-.doctor-schedule-profile {
-  text-align: center;
+.doctor-schedule-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.doctor-schedule-avatar {
-  width: 72px;
-  height: 72px;
-  border-radius: 36px;
-  background-color: #f0f0f0;
-  margin: 0 auto 12px;
+.doctor-schedule-item {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #f0f0f0;
+  background-color: #fff;
 }
 
-.doctor-schedule-name {
-  font-weight: 600;
+.doctor-schedule-item-time {
+  width: 110px;
+  color: #86909c;
+  font-size: 12px;
+}
+
+.doctor-schedule-item-content {
+  flex: 1;
+}
+
+.doctor-schedule-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 4px;
 }
 
-.doctor-schedule-meta {
+.doctor-schedule-item-title {
+  font-weight: 600;
+}
+
+.doctor-schedule-item-meta {
   font-size: 12px;
   color: #86909c;
+  margin-bottom: 4px;
 }
 
-.doctor-schedule-section-title {
-  font-weight: 600;
-  margin-bottom: 16px;
+.doctor-schedule-item-remark {
+  font-size: 12px;
 }
 
-.doctor-schedule-date-cell {
-  width: 24px;
-  height: 24px;
-  line-height: 24px;
-  border-radius: 12px;
-  text-align: center;
-  margin: 0 auto;
+.doctor-schedule-sidebar-card {
+  height: 100%;
 }
 
-.doctor-schedule-date-cell-active {
-  background-color: #1677ff;
-  color: #fff;
-}
-
-.doctor-schedule-slots {
+.doctor-schedule-sidebar-actions {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 8px;
   margin-bottom: 16px;
 }
 
-.doctor-schedule-confirm {
-  margin-top: 24px;
-  display: flex;
-  justify-content: flex-end;
+.doctor-schedule-calendar {
+  border-top: 1px solid #f0f0f0;
+  padding-top: 16px;
 }
-
-.doctor-schedule-footer {
-  margin-top: 8px;
-}
-

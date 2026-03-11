@@ -7,6 +7,8 @@ import AppointmentPage from '../pages/Appointment'
 import AppointmentDoctorsPage from '../pages/AppointmentDoctors'
 import DoctorSchedulePage from '../pages/DoctorSchedule'
 import SettingsPage from '../pages/Settings'
+import DoctorPatientManagePage from '../pages/DoctorPatientManage'
+import DoctorPatientsPage from '../pages/DoctorPatients'
 import MainLayout from '../layout/MainLayout.jsx'
 import DoctorDashboardPage from '../pages/DoctorDashboard'
 import RequireAuth from '../router/requireAuth.jsx'
@@ -52,6 +54,36 @@ const router = createBrowserRouter([
       <RequireAuth>
         <MainLayout>
           <DoctorDashboardPage />
+        </MainLayout>
+      </RequireAuth>
+    ),
+  },
+  {
+    path: '/doctor/patient-manage',
+    element: (
+      <RequireAuth>
+        <MainLayout>
+          <DoctorPatientManagePage />
+        </MainLayout>
+      </RequireAuth>
+    ),
+  },
+  {
+    path: '/doctor/my-patients',
+    element: (
+      <RequireAuth>
+        <MainLayout>
+          <DoctorPatientsPage />
+        </MainLayout>
+      </RequireAuth>
+    ),
+  },
+  {
+    path: '/doctor/schedule',
+    element: (
+      <RequireAuth>
+        <MainLayout>
+          <DoctorSchedulePage />
         </MainLayout>
       </RequireAuth>
     ),
