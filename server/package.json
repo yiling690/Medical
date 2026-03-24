@@ -2,9 +2,9 @@
   "name": "emr-server",
   "private": true,
   "version": "0.0.1",
-  "main": "app.js",
+  "main": "index.js",
   "scripts": {
-    "dev": "node app.js"
+    "dev": "node index.js"
   },
   "dependencies": {
     "cors": "^2.8.5",

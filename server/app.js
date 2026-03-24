@@ -1,10 +1,10 @@
 const express = require('express')
 const cors = require('cors')
-const { router: authRoutes } = require('./routes/auth')
+const authRoutes = require('./routes/auth')
 const patientRoutes = require('./routes/patient')
+const statsRoutes = require('./routes/stats')
 
 const app = express()
-const PORT = 3000
 
 app.use(cors())
 app.use(express.json())
@@ -15,8 +15,7 @@ app.get('/api/test', (req, res) => {
 
 app.use('/api/auth', authRoutes)
 app.use('/api/patient', patientRoutes)
+app.use('/api/stats', statsRoutes)
 
-app.listen(PORT, () => {
-  console.log(`server start ${PORT}`)
-})
+module.exports = app
 

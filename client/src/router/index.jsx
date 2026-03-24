@@ -9,6 +9,7 @@ import DoctorSchedulePage from '../pages/DoctorSchedule'
 import SettingsPage from '../pages/Settings'
 import DoctorPatientManagePage from '../pages/DoctorPatientManage'
 import DoctorPatientsPage from '../pages/DoctorPatients'
+import StatsPage from '../pages/Stats'
 import MainLayout from '../layout/MainLayout.jsx'
 import DoctorDashboardPage from '../pages/DoctorDashboard'
 import RequireAuth from '../router/requireAuth.jsx'
@@ -84,6 +85,16 @@ const router = createBrowserRouter([
       <RequireAuth>
         <MainLayout>
           <DoctorSchedulePage />
+        </MainLayout>
+      </RequireAuth>
+    ),
+  },
+  {
+    path: '/doctor/stats',
+    element: (
+      <RequireAuth>
+        <MainLayout>
+          <StatsPage />
         </MainLayout>
       </RequireAuth>
     ),

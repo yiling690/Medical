@@ -23,6 +23,7 @@ function MainLayout({ children }) {
         { key: 'doctor-manage', icon: <FileTextOutlined />, label: '患者管理' },
         { key: 'doctor-my-patients', icon: <FileTextOutlined />, label: '我的患者' },
         { key: 'doctor-schedule', icon: <CalendarOutlined />, label: '日程安排' },
+        { key: 'doctor-stats', icon: <CalendarOutlined />, label: '数据统计' },
         { key: 'doctor-settings', icon: <SettingOutlined />, label: '基础设置' },
       ]
     : [
@@ -45,6 +46,9 @@ function MainLayout({ children }) {
       }
       if (info.key === 'doctor-schedule') {
         navigate('/doctor/schedule')
+      }
+      if (info.key === 'doctor-stats') {
+        navigate('/doctor/stats')
       }
       if (info.key === 'doctor-settings') {
         navigate('/settings')
@@ -78,6 +82,9 @@ function MainLayout({ children }) {
     }
     if (location.pathname.startsWith('/doctor/schedule')) {
       selectedKeys.push('doctor-schedule')
+    }
+    if (location.pathname.startsWith('/doctor/stats')) {
+      selectedKeys.push('doctor-stats')
     }
     if (location.pathname.startsWith('/settings')) {
       selectedKeys.push('doctor-settings')
