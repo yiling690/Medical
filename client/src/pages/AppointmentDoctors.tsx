@@ -107,7 +107,7 @@ function AppointmentDoctorsPage(): React.ReactElement {
 
       <Row gutter={16}>
         <Col span={6}>
-          <Card className="appointment-dept-card" bordered>
+          <Card className="appointment-dept-card" variant="outlined">
             <div className="appointment-dept-title">选择科室</div>
             <Flex vertical className="appointment-dept-list">
               {departments.map((item) => (
@@ -132,7 +132,7 @@ function AppointmentDoctorsPage(): React.ReactElement {
           </Card>
         </Col>
         <Col span={18}>
-          <Card className="appointment-doctor-list-card" bordered>
+          <Card className="appointment-doctor-list-card" variant="outlined">
             <div className="appointment-doctor-list-header">
               <div>
                 <div className="appointment-doctor-list-title">
@@ -154,7 +154,7 @@ function AppointmentDoctorsPage(): React.ReactElement {
                 <Col key={doctor.id} xs={24} sm={12} md={8}>
                   <Card
                     className="appointment-doctor-card"
-                    bordered
+                    variant="outlined"
                     actions={[
                       <Button
                         type="primary"

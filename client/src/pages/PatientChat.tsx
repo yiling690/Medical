@@ -136,7 +136,7 @@ function PatientChatPage(): React.ReactElement {
 
       <Row gutter={16}>
         <Col span={7}>
-          <Card className="patient-chat-list-card" bordered>
+          <Card className="patient-chat-list-card" variant="outlined">
             <div className="patient-chat-list-header">
               <div className="patient-chat-list-title">我的会话</div>
               <Input.Search
@@ -189,7 +189,7 @@ function PatientChatPage(): React.ReactElement {
         </Col>
 
         <Col span={17}>
-          <Card className="patient-chat-detail-card" bordered>
+          <Card className="patient-chat-detail-card" variant="outlined">
             <div className="patient-chat-detail-header">
               <Title level={4} style={{ marginBottom: 4 }}>
                 沟通窗口{currentConversation ? ` - ${currentConversation.doctorName}` : ''}

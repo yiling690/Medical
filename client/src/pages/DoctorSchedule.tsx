@@ -212,7 +212,7 @@ function DoctorSchedulePage(): React.ReactElement {
 
       <Row gutter={24}>
         <Col span={16}>
-          <Card className="doctor-schedule-main-card" bordered>
+          <Card className="doctor-schedule-main-card" variant="outlined">
             <div className="doctor-schedule-list">
               {displayItems.map((item) => (
                 <div key={item.id} className="doctor-schedule-item">
@@ -244,7 +244,7 @@ function DoctorSchedulePage(): React.ReactElement {
           </Card>
         </Col>
         <Col span={8}>
-          <Card className="doctor-schedule-sidebar-card" bordered>
+          <Card className="doctor-schedule-sidebar-card" variant="outlined">
             <div className="doctor-schedule-sidebar-actions">
               <Button type="primary" block onClick={handleAddSchedule}>
                 添加新日程

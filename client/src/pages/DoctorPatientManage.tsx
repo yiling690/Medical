@@ -171,7 +171,7 @@ function DoctorPatientManagePage(): React.ReactElement {
 
       <Row gutter={16}>
         <Col span={6}>
-          <Card className="doctor-patient-list-card" bordered>
+          <Card className="doctor-patient-list-card" variant="outlined">
             <div className="doctor-patient-list-header">
               <div className="doctor-patient-list-title">患者列表</div>
               <Input.Search
@@ -222,7 +222,7 @@ function DoctorPatientManagePage(): React.ReactElement {
           </Card>
         </Col>
         <Col span={18}>
-          <Card className="doctor-patient-detail-card" bordered>
+          <Card className="doctor-patient-detail-card" variant="outlined">
             <div className="doctor-patient-detail-header">
               <Title level={4} style={{ marginBottom: 4 }}>
                 医患沟通{currentPatient ? ` - ${currentPatient.name}` : ''}

@@ -151,7 +151,7 @@ function AppointmentSchedulePage(): React.ReactElement {
 
       <Row gutter={24}>
         <Col span={16}>
-          <Card className="doctor-schedule-main-card" bordered>
+          <Card className="doctor-schedule-main-card" variant="outlined">
             <div className="doctor-schedule-list">
               <div className="doctor-schedule-item">
                 <div className="doctor-schedule-item-time">
@@ -240,7 +240,7 @@ function AppointmentSchedulePage(): React.ReactElement {
           </Card>
         </Col>
         <Col span={8}>
-          <Card className="doctor-schedule-sidebar-card" bordered>
+          <Card className="doctor-schedule-sidebar-card" variant="outlined">
             <div className="doctor-schedule-calendar">
               <Calendar
                 fullscreen={false}
@@ -292,4 +292,3 @@ function AppointmentSchedulePage(): React.ReactElement {
 }
 
 export default AppointmentSchedulePage
-

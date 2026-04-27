@@ -60,10 +60,12 @@ function AppointmentRecordsPage(): React.ReactElement {
   const [loadingAppointments, setLoadingAppointments] = useState(false)
   const [loadingOrders, setLoadingOrders] = useState(false)
 
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async (silent = false) => {
     try {
-      setLoadingAppointments(true)
-      setLoadingOrders(true)
+      if (!silent) {
+        setLoadingAppointments(true)
+        setLoadingOrders(true)
+      }
       const [appointmentsRes, ordersRes] = await Promise.all([
         request.get<{ appointments: AppointmentRecord[] }>('/appointments'),
         request.get<{ orders: InspectionOrder[] }>('/appointments/orders'),
@@ -73,17 +75,21 @@ function AppointmentRecordsPage(): React.ReactElement {
     } catch (error: any) {
       setRecords([])
       setOrders([])
-      const msg = error.response?.data?.message || '获取预约与检查单信息失败'
-      message.error(msg)
+      if (!silent) {
+        const msg = error.response?.data?.message || '获取预约与检查单信息失败'
+        message.error(msg)
+      }
     } finally {
-      setLoadingAppointments(false)
-      setLoadingOrders(false)
+      if (!silent) {
+        setLoadingAppointments(false)
+        setLoadingOrders(false)
+      }
     }
   }, [])
 
   useEffect(() => {
     fetchData()
-    const timer = window.setInterval(fetchData, 5000)
+    const timer = window.setInterval(() => fetchData(true), 5000)
 
     return () => {
       window.clearInterval(timer)
