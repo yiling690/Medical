@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Card, Col, Empty, Row, Skeleton, Statistic, Table, Typography, message, Progress } from 'antd'
 import request from '../api/request'
 import useAuthStore from '../store/auth'
@@ -52,45 +52,66 @@ function StatsPage(): React.ReactElement {
   const [departments, setDepartments] = useState<DepartmentRow[]>([])
   const totalDiseaseCount = diseases.reduce((sum, item) => sum + item.count, 0)
 
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
+  const fetchStats = useCallback(async (silent = false) => {
+    try {
+      if (!silent) {
         setLoading(true)
-        const res = await request.get<StatsResponse>('/stats/overview')
-        setSummary(res.data.summary)
-        setDiseases(
-          res.data.diseases.map((d, index) => ({
-            key: `${index}`,
-            name: d.name,
-            count: d.count,
-          })),
-        )
-        setVisits(
-          res.data.visitsByDate.map((v, index) => ({
-            key: `${index}`,
-            date: v.date,
-            count: v.count,
-          })),
-        )
-        setDepartments(
-          (res.data.departments || []).map((d, index) => ({
-            key: `${index}`,
-            name: d.name,
-            count: d.count,
-          })),
-        )
-      } catch (error: any) {
+      }
+      const res = await request.get<StatsResponse>('/stats/overview')
+      setSummary(res.data.summary)
+      setDiseases(
+        res.data.diseases.map((d, index) => ({
+          key: `${index}`,
+          name: d.name,
+          count: d.count,
+        })),
+      )
+      setVisits(
+        res.data.visitsByDate.map((v, index) => ({
+          key: `${index}`,
+          date: v.date,
+          count: v.count,
+        })),
+      )
+      setDepartments(
+        (res.data.departments || []).map((d, index) => ({
+          key: `${index}`,
+          name: d.name,
+          count: d.count,
+        })),
+      )
+    } catch (error: any) {
+      if (!silent) {
         const msg =
           error.response?.data?.message ||
           error.message ||
           '获取统计数据失败'
         message.error(msg)
-      } finally {
+      }
+    } finally {
+      if (!silent) {
         setLoading(false)
       }
     }
-    fetchStats()
   }, [])
+
+  useEffect(() => {
+    fetchStats()
+
+    const handleAppointmentConfirmed = () => {
+      fetchStats(true)
+    }
+
+    window.addEventListener('appointment-confirmed', handleAppointmentConfirmed)
+    const timer = window.setInterval(() => {
+      fetchStats(true)
+    }, 5000)
+
+    return () => {
+      window.removeEventListener('appointment-confirmed', handleAppointmentConfirmed)
+      window.clearInterval(timer)
+    }
+  }, [fetchStats])
 
   return (
     <div className="stats-page">

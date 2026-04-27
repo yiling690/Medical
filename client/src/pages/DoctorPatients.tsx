@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Button, Card, Empty, Form, Input, Modal, Space, Spin, Table, Tag, Typography, message } from 'antd'
 import request from '../api/request'
 import useAuthStore from '../store/auth'
@@ -115,9 +115,11 @@ function DoctorPatientsPage(): React.ReactElement {
   const [detailStartDate, setDetailStartDate] = useState('')
   const [detailEndDate, setDetailEndDate] = useState('')
 
-  const fetchRecords = async () => {
+  const fetchRecords = useCallback(async (silent = false) => {
     try {
-      setLoading(true)
+      if (!silent) {
+        setLoading(true)
+      }
       const res = await request.get<RecordsResponse>('/patient/records', {
         params: {
           keyword: keyword.trim() || undefined,
@@ -143,15 +145,19 @@ function DoctorPatientsPage(): React.ReactElement {
       setTotalPatients(nextTotalPatients)
       setTotalRecords(nextTotalRecords)
     } catch (error: any) {
-      const msg = error.response?.data?.message || '获取患者数据失败'
-      message.error(msg)
+      if (!silent) {
+        const msg = error.response?.data?.message || '获取患者数据失败'
+        message.error(msg)
+      }
       setRecords([])
       setTotalPatients(0)
       setTotalRecords(0)
     } finally {
-      setLoading(false)
+      if (!silent) {
+        setLoading(false)
+      }
     }
-  }
+  }, [activeTab, endDate, keyword, page, pageSize, startDate])
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -159,7 +165,23 @@ function DoctorPatientsPage(): React.ReactElement {
     }, keyword.trim() ? 300 : 0)
 
     return () => window.clearTimeout(timer)
-  }, [activeTab, endDate, keyword, page, pageSize, startDate])
+  }, [fetchRecords, keyword])
+
+  useEffect(() => {
+    const handleAppointmentConfirmed = () => {
+      fetchRecords(true)
+    }
+
+    window.addEventListener('appointment-confirmed', handleAppointmentConfirmed)
+    const timer = window.setInterval(() => {
+      fetchRecords(true)
+    }, 5000)
+
+    return () => {
+      window.removeEventListener('appointment-confirmed', handleAppointmentConfirmed)
+      window.clearInterval(timer)
+    }
+  }, [fetchRecords])
 
   const patientRows = useMemo(() => {
     if (records.length === 0) {

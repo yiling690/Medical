@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   Button,
   Card,
@@ -82,25 +82,45 @@ function DoctorDashboardPage(): React.ReactElement {
     [patients],
   )
 
-  const fetchDashboard = async () => {
+  const fetchDashboard = useCallback(async (silent = false) => {
     try {
-      setLoading(true)
+      if (!silent) {
+        setLoading(true)
+      }
       const res = await request.get<DashboardResponse>('/appointments/doctor-dashboard')
       setPatients(res.data.patients || [])
     } catch (error: any) {
-      const msg =
-        error.response?.data?.message ||
-        error.message ||
-        '获取医生工作台数据失败'
-      message.error(msg)
+      if (!silent) {
+        const msg =
+          error.response?.data?.message ||
+          error.message ||
+          '获取医生工作台数据失败'
+        message.error(msg)
+      }
     } finally {
-      setLoading(false)
+      if (!silent) {
+        setLoading(false)
+      }
     }
-  }
+  }, [])
 
   useEffect(() => {
     fetchDashboard()
-  }, [])
+
+    const handleAppointmentConfirmed = () => {
+      fetchDashboard(true)
+    }
+
+    window.addEventListener('appointment-confirmed', handleAppointmentConfirmed)
+    const timer = window.setInterval(() => {
+      fetchDashboard(true)
+    }, 5000)
+
+    return () => {
+      window.removeEventListener('appointment-confirmed', handleAppointmentConfirmed)
+      window.clearInterval(timer)
+    }
+  }, [fetchDashboard])
 
   useEffect(() => {
     if (!currentPatient) {

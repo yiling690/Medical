@@ -1,4 +1,5 @@
 const pool = require('../config/db')
+const { appointments } = require('../models/appointmentModel')
 
 const recordSelect = `
   SELECT
@@ -20,6 +21,62 @@ const recordSelect = `
   FROM medical_record r
   JOIN patient p ON r.patient_id = p.id
 `
+
+const isWithinDateRange = (value, startDate, endDate) => {
+  if (!value) {
+    return false
+  }
+
+  if (startDate && value < startDate) {
+    return false
+  }
+
+  if (endDate && value > endDate) {
+    return false
+  }
+
+  return true
+}
+
+const matchesKeyword = (record, keyword) => {
+  if (!keyword) {
+    return true
+  }
+
+  const normalizedKeyword = keyword.toLowerCase()
+  return [
+    record.patientId,
+    record.patientName,
+    record.phone,
+    record.doctor,
+    record.hospital,
+    record.department,
+    record.summary,
+    record.diagnosis,
+    record.treatment,
+    record.note,
+  ].some((item) => `${item || ''}`.toLowerCase().includes(normalizedKeyword))
+}
+
+const buildAppointmentRecord = (appointment) => ({
+  id: -Math.abs(Number(appointment.id) || 0),
+  patientId: appointment.patientId,
+  patientName: appointment.patientName,
+  gender: null,
+  age: null,
+  phone: null,
+  hospital: appointment.hospital || '',
+  department: appointment.department || '',
+  doctor: appointment.doctorName || '',
+  date: appointment.date || '',
+  summary: '已确认预约，待就诊',
+  diagnosis: null,
+  treatment: null,
+  noteDate: appointment.date || null,
+  note: `预约时间：${appointment.date || ''} ${appointment.time || ''}`.trim(),
+})
+
+const buildRecordIdentityKey = (record) => `${record.patientId || ''}__${record.doctor || ''}__${record.date || ''}`
 
 const getRecordByIdFromDb = async (executor, id) => {
   const [rows] = await executor.query(
@@ -128,6 +185,130 @@ const getRecords = async (req, res) => {
   }
 
   try {
+    if (user.role === 'doctor' && user.name) {
+      const [dbRows] = await pool.query(
+        `
+        ${recordSelect}
+        WHERE ${where}
+        ORDER BY r.date DESC, r.id DESC
+        `,
+        params,
+      )
+
+      const existingRecordKeys = new Set(dbRows.map(buildRecordIdentityKey))
+
+      const syntheticRows = Array.from(
+        appointments
+          .filter((item) => item.doctorName === user.name && item.status === '确认')
+          .reduce((map, item) => {
+            const existing = map.get(item.patientId)
+            const nextTime = new Date(`${item.date || ''} ${item.time || '00:00'}`).getTime()
+            const existingTime = existing
+              ? new Date(`${existing.date || ''} ${existing.time || '00:00'}`).getTime()
+              : Number.NEGATIVE_INFINITY
+
+            if (!existing || nextTime >= existingTime) {
+              map.set(item.patientId, item)
+            }
+
+            return map
+          }, new Map())
+          .values(),
+      )
+        .map(buildAppointmentRecord)
+        .filter((record) => !existingRecordKeys.has(buildRecordIdentityKey(record)))
+        .filter((record) => {
+          if (scope === 'recent' && record.date < new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)) {
+            return false
+          }
+
+          if (!isWithinDateRange(record.date, startDate, endDate)) {
+            return false
+          }
+
+          return matchesKeyword(record, keyword)
+        })
+
+      const latestByPatient = new Map()
+      const updateLatestRecord = (record) => {
+        if (!record.patientId) {
+          return
+        }
+
+        const current = latestByPatient.get(record.patientId)
+        const recordTime = new Date(record.date || '').getTime()
+        const currentTime = current ? new Date(current.date || '').getTime() : Number.NEGATIVE_INFINITY
+
+        if (!current || recordTime >= currentTime) {
+          latestByPatient.set(record.patientId, record)
+        }
+      }
+
+      dbRows.forEach(updateLatestRecord)
+      syntheticRows.forEach(updateLatestRecord)
+
+      const sortedPatientIds = Array.from(latestByPatient.entries())
+        .sort((a, b) => {
+          const diff = new Date(b[1].date || '').getTime() - new Date(a[1].date || '').getTime()
+          if (diff !== 0) {
+            return diff
+          }
+          return `${a[0]}`.localeCompare(`${b[0]}`)
+        })
+        .map(([patientId]) => patientId)
+
+      const totalPatients = sortedPatientIds.length
+      const totalRecords = dbRows.length + syntheticRows.length
+
+      if (!hasPagination) {
+        const mergedRows = [...dbRows]
+        syntheticRows.forEach((record) => {
+          mergedRows.push(record)
+        })
+
+        mergedRows.sort((a, b) => {
+          const diff = new Date(b.date || '').getTime() - new Date(a.date || '').getTime()
+          return diff !== 0 ? diff : b.id - a.id
+        })
+
+        return res.json({ records: mergedRows })
+      }
+
+      if (totalPatients === 0) {
+        return res.json({
+          records: [],
+          pagination: {
+            page,
+            pageSize,
+            total: 0,
+            totalRecords: 0,
+          },
+        })
+      }
+
+      const offset = (page - 1) * pageSize
+      const pagePatientIds = sortedPatientIds.slice(offset, offset + pageSize)
+      const pagePatientIdSet = new Set(pagePatientIds)
+
+      const mergedRows = [
+        ...dbRows.filter((record) => pagePatientIdSet.has(record.patientId)),
+        ...syntheticRows.filter((record) => pagePatientIdSet.has(record.patientId)),
+      ].sort((a, b) => {
+        const diff = new Date(b.date || '').getTime() - new Date(a.date || '').getTime()
+        return diff !== 0 ? diff : b.id - a.id
+      })
+
+      return res.json({
+        records: mergedRows,
+        pagination: {
+          page,
+          pageSize,
+          total: totalPatients,
+          totalRecords,
+        },
+      })
+    }
+
     if (!hasPagination) {
       const [rows] = await pool.query(
         `
