@@ -4,6 +4,7 @@ const { appointments } = require('../models/appointmentModel')
 const recordSelect = `
   SELECT
     r.id,
+    'record' AS sourceType,
     p.patient_no AS patientId,
     p.name AS patientName,
     p.gender,
@@ -58,8 +59,9 @@ const matchesKeyword = (record, keyword) => {
   ].some((item) => `${item || ''}`.toLowerCase().includes(normalizedKeyword))
 }
 
-const buildAppointmentRecord = (appointment) => ({
+const buildAppointmentRecord = (appointment, sourceType = 'appointment_pending') => ({
   id: -Math.abs(Number(appointment.id) || 0),
+  sourceType,
   patientId: appointment.patientId,
   patientName: appointment.patientName,
   gender: null,
@@ -69,7 +71,7 @@ const buildAppointmentRecord = (appointment) => ({
   department: appointment.department || '',
   doctor: appointment.doctorName || '',
   date: appointment.date || '',
-  summary: '已确认预约，待就诊',
+  summary: sourceType === 'appointment_active' ? '接诊中，已开检查单' : '已确认预约，待就诊',
   diagnosis: null,
   treatment: null,
   noteDate: appointment.date || null,
@@ -194,8 +196,25 @@ const getRecords = async (req, res) => {
         `,
         params,
       )
+      const [orderRows] = await pool.query(
+        `
+        SELECT
+          patient_id AS patientId,
+          status
+        FROM inspection_order
+        WHERE doctor_name = ?
+        ORDER BY updated_at DESC, id DESC
+        `,
+        [user.name],
+      )
 
       const existingRecordKeys = new Set(dbRows.map(buildRecordIdentityKey))
+      const patientOrderStatusMap = new Map()
+      orderRows.forEach((item) => {
+        if (!patientOrderStatusMap.has(item.patientId)) {
+          patientOrderStatusMap.set(item.patientId, item.status || '待检查')
+        }
+      })
 
       const syntheticRows = Array.from(
         appointments
@@ -215,7 +234,14 @@ const getRecords = async (req, res) => {
           }, new Map())
           .values(),
       )
-        .map(buildAppointmentRecord)
+        .map((appointment) =>
+          buildAppointmentRecord(
+            appointment,
+            patientOrderStatusMap.has(appointment.patientId)
+              ? 'appointment_active'
+              : 'appointment_pending',
+          ),
+        )
         .filter((record) => !existingRecordKeys.has(buildRecordIdentityKey(record)))
         .filter((record) => {
           if (scope === 'recent' && record.date < new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)) {

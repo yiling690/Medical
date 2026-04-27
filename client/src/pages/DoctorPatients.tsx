@@ -8,6 +8,7 @@ const { Title, Text } = Typography
 
 interface MedicalRecord {
   id: number
+  sourceType?: 'record' | 'appointment_pending' | 'appointment_active'
   patientId: string
   patientName: string
   gender?: string | null
@@ -35,10 +36,40 @@ interface DoctorPatientRow {
   diagnosis: string
   latestHospital: string
   latestDepartment: string
+  careStatus: '已建病历' | '待接诊' | '接诊中'
   recent: boolean
   mine: boolean
   recordCount: number
   records: MedicalRecord[]
+}
+
+const getCareStatusColor = (status: DoctorPatientRow['careStatus']): string => {
+  if (status === '接诊中') {
+    return 'blue'
+  }
+  if (status === '待接诊') {
+    return 'orange'
+  }
+
+  return 'green'
+}
+
+const getCareStatusBySourceType = (
+  sourceType?: MedicalRecord['sourceType'],
+): DoctorPatientRow['careStatus'] => {
+  if (sourceType === 'appointment_active') {
+    return '接诊中'
+  }
+  if (sourceType === 'appointment_pending') {
+    return '待接诊'
+  }
+  return '已建病历'
+}
+
+const CARE_STATUS_RANK: Record<DoctorPatientRow['careStatus'], number> = {
+  待接诊: 1,
+  接诊中: 2,
+  已建病历: 3,
 }
 
 interface RecordsResponse {
@@ -205,6 +236,7 @@ function DoctorPatientsPage(): React.ReactElement {
       const isMine = !!user?.name && record.doctor === user.name
 
       if (!existing) {
+        const careStatus = getCareStatusBySourceType(record.sourceType)
         grouped.set(record.patientId, {
           key: record.patientId,
           patientId: record.patientId,
@@ -216,6 +248,7 @@ function DoctorPatientsPage(): React.ReactElement {
           diagnosis: record.diagnosis || record.summary || '暂无诊断',
           latestHospital: record.hospital,
           latestDepartment: record.department,
+          careStatus,
           recent: isRecent,
           mine: isMine,
           recordCount: 1,
@@ -228,6 +261,10 @@ function DoctorPatientsPage(): React.ReactElement {
       existing.recordCount += 1
       existing.recent = existing.recent || isRecent
       existing.mine = existing.mine || isMine
+      const nextCareStatus = getCareStatusBySourceType(record.sourceType)
+      if (CARE_STATUS_RANK[nextCareStatus] > CARE_STATUS_RANK[existing.careStatus]) {
+        existing.careStatus = nextCareStatus
+      }
 
       const existingTime = new Date(existing.lastVisit).getTime()
       if (!Number.isFinite(existingTime) || recordTime > existingTime) {
@@ -531,11 +568,20 @@ function DoctorPatientsPage(): React.ReactElement {
                       <Text strong>
                         {record.name} ({record.patientId})
                       </Text>
+                      <Tag color={getCareStatusColor(record.careStatus)}>
+                        {record.careStatus}
+                      </Tag>
                       <Text type="secondary">
                         {record.gender} / {record.age}岁
                       </Text>
                     </Space>
                   ),
+                },
+                {
+                  title: '接诊状态',
+                  dataIndex: 'careStatus',
+                  key: 'careStatus',
+                  render: (text) => <Tag color={getCareStatusColor(text)}>{text}</Tag>,
                 },
                 { title: '联系电话', dataIndex: 'phone', key: 'phone' },
                 { title: '最新就诊日期', dataIndex: 'lastVisit', key: 'lastVisit' },

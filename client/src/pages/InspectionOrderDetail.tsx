@@ -69,12 +69,18 @@ function InspectionOrderDetailPage(): React.ReactElement | null {
     }
 
     fetchDetail()
+    const handleInspectionOrderChanged = () => {
+      fetchDetail(true)
+    }
+
+    window.addEventListener('inspection-order-changed', handleInspectionOrderChanged)
     const timer = window.setInterval(() => {
       fetchDetail(true)
     }, 5000)
 
     return () => {
       cancelled = true
+      window.removeEventListener('inspection-order-changed', handleInspectionOrderChanged)
       window.clearInterval(timer)
     }
   }, [id])

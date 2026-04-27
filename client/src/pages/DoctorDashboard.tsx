@@ -159,6 +159,11 @@ function DoctorDashboardPage(): React.ReactElement {
       })
 
       message.success(res.data?.message || '检查单已保存')
+      window.dispatchEvent(
+        new CustomEvent('inspection-order-changed', {
+          detail: { order: res.data?.order || null, action: 'saved' },
+        }),
+      )
       setOrderVisible(false)
       await fetchDashboard()
     } catch (error: any) {
@@ -192,6 +197,11 @@ function DoctorDashboardPage(): React.ReactElement {
         status,
       })
       message.success(res.data?.message || '检查单状态已更新')
+      window.dispatchEvent(
+        new CustomEvent('inspection-order-changed', {
+          detail: { order: res.data?.order || null, action: 'status-updated' },
+        }),
+      )
       await fetchDashboard()
     } catch (error: any) {
       const msg =

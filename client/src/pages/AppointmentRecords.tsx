@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button, Card, Col, Empty, Row, Tag, Typography, message } from 'antd'
 import request from '../api/request'
@@ -59,6 +59,30 @@ function AppointmentRecordsPage(): React.ReactElement {
   const [orders, setOrders] = useState<InspectionOrder[]>([])
   const [loadingAppointments, setLoadingAppointments] = useState(false)
   const [loadingOrders, setLoadingOrders] = useState(false)
+  const previousOrdersRef = useRef<InspectionOrder[] | null>(null)
+
+  const syncOrderFeedback = useCallback((nextOrders: InspectionOrder[]) => {
+    const previousOrders = previousOrdersRef.current
+    if (!previousOrders) {
+      previousOrdersRef.current = nextOrders
+      return
+    }
+
+    const previousMap = new Map(previousOrders.map((item) => [item.id, item]))
+    const newOrders = nextOrders.filter((item) => !previousMap.has(item.id))
+    const changedStatusOrders = nextOrders.filter((item) => {
+      const previous = previousMap.get(item.id)
+      return previous && previous.status !== item.status
+    })
+
+    if (newOrders.length > 0) {
+      message.success(`收到 ${newOrders.length} 张新的检查单`)
+    } else if (changedStatusOrders.length > 0) {
+      message.info(`有 ${changedStatusOrders.length} 张检查单状态已更新`)
+    }
+
+    previousOrdersRef.current = nextOrders
+  }, [])
 
   const fetchData = useCallback(async (silent = false) => {
     try {
@@ -71,10 +95,17 @@ function AppointmentRecordsPage(): React.ReactElement {
         request.get<{ orders: InspectionOrder[] }>('/appointments/orders'),
       ])
       setRecords(appointmentsRes.data.appointments || [])
-      setOrders(ordersRes.data.orders || [])
+      const nextOrders = ordersRes.data.orders || []
+      setOrders(nextOrders)
+      if (silent) {
+        syncOrderFeedback(nextOrders)
+      } else {
+        previousOrdersRef.current = nextOrders
+      }
     } catch (error: any) {
       setRecords([])
       setOrders([])
+      previousOrdersRef.current = []
       if (!silent) {
         const msg = error.response?.data?.message || '获取预约与检查单信息失败'
         message.error(msg)
@@ -85,13 +116,19 @@ function AppointmentRecordsPage(): React.ReactElement {
         setLoadingOrders(false)
       }
     }
-  }, [])
+  }, [syncOrderFeedback])
 
   useEffect(() => {
     fetchData()
+    const handleInspectionOrderChanged = () => {
+      fetchData(true)
+    }
+
+    window.addEventListener('inspection-order-changed', handleInspectionOrderChanged)
     const timer = window.setInterval(() => fetchData(true), 5000)
 
     return () => {
+      window.removeEventListener('inspection-order-changed', handleInspectionOrderChanged)
       window.clearInterval(timer)
     }
   }, [fetchData])

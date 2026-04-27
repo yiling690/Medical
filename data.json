@@ -28,5 +28,18 @@
     }
   ],
   "medical_record": [],
+  "inspection_order": [
+    {
+      "id": 1,
+      "doctor_name": "王医生",
+      "patient_id": "TEMP-2",
+      "patient_name": "张三",
+      "items_json": "[\"胸片\"]",
+      "remark": "肺部检查",
+      "status": "待检查",
+      "created_at": "2026-04-27T18:30:29.023Z",
+      "updated_at": "2026-04-27T18:30:29.023Z"
+    }
+  ],
   "audit_log": []
 }
