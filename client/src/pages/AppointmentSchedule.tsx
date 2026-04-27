@@ -247,12 +247,18 @@ function AppointmentSchedulePage(): React.ReactElement {
                 value={selectedDate}
                 onSelect={handleSelectDate}
                 onChange={handleSelectDate}
-                dateFullCellRender={(date) => (
-                  <div style={{ textAlign: 'center' }}>
-                    <div>{date.date()}</div>
-                    <div>{renderDateTag(date)}</div>
-                  </div>
-                )}
+                fullCellRender={(date, info) => {
+                  if (info.type !== 'date') {
+                    return info.originNode
+                  }
+
+                  return (
+                    <div style={{ textAlign: 'center' }}>
+                      <div>{date.date()}</div>
+                      <div>{renderDateTag(date)}</div>
+                    </div>
+                  )
+                }}
               />
             </div>
             <div style={{ marginTop: 16 }}>
