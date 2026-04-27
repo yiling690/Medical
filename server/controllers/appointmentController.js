@@ -42,6 +42,19 @@ const parseOrderItems = (value) => {
 
 const VALID_ORDER_STATUSES = ['待检查', '已检查']
 
+const resolvePatientId = async (user) => {
+  if (user.patientId) {
+    return user.patientId
+  }
+
+  const [rows] = await pool.query(
+    'SELECT id, username, role, name, patient_id AS patientId FROM user WHERE id = ? LIMIT 1',
+    [user.id],
+  )
+
+  return rows[0]?.patientId || `TEMP-${user.id}`
+}
+
 const getAppointments = (req, res) => {
   const user = req.user
 
@@ -326,7 +339,7 @@ const getDoctorDashboard = async (req, res) => {
   }
 }
 
-const createAppointment = (req, res) => {
+const createAppointment = async (req, res) => {
   const user = req.user
 
   if (user.role !== 'patient') {
@@ -339,27 +352,31 @@ const createAppointment = (req, res) => {
     return res.status(400).json({ message: '预约信息不完整' })
   }
 
-  const appointment = {
-    id: Date.now(),
-    patientId: user.patientId || `TEMP-${user.id}`,
-    patientName: user.name,
-    doctorName: defaultDoctor?.name || doctorName,
-    hospital,
-    department,
-    date,
-    time,
-    status: '待确认',
-    confirmedAt: null,
-    confirmedBy: null,
-    createdAt: Date.now(),
+  try {
+    const appointment = {
+      id: Date.now(),
+      patientId: await resolvePatientId(user),
+      patientName: user.name,
+      doctorName: defaultDoctor?.name || doctorName,
+      hospital,
+      department,
+      date,
+      time,
+      status: '待确认',
+      confirmedAt: null,
+      confirmedBy: null,
+      createdAt: Date.now(),
+    }
+
+    appointments.push(appointment)
+
+    res.status(201).json({
+      message: '预约成功',
+      appointment,
+    })
+  } catch (error) {
+    res.status(500).json({ message: '预约失败，请稍后重试' })
   }
-
-  appointments.push(appointment)
-
-  res.status(201).json({
-    message: '预约成功',
-    appointment,
-  })
 }
 
 const confirmAppointment = (req, res) => {

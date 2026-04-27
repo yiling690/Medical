@@ -39,6 +39,17 @@
       "status": "待检查",
       "created_at": "2026-04-27T18:30:29.023Z",
       "updated_at": "2026-04-27T18:30:29.023Z"
+    },
+    {
+      "id": 2,
+      "doctor_name": "王医生",
+      "patient_id": "P-202300123",
+      "patient_name": "张三",
+      "items_json": "[\"心电图\"]",
+      "remark": "心间",
+      "status": "待检查",
+      "created_at": "2026-04-27T18:41:26.664Z",
+      "updated_at": "2026-04-27T18:41:26.664Z"
     }
   ],
   "audit_log": []

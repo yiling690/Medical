@@ -4,13 +4,30 @@ const messages = []
 let conversationSeq = 1
 let messageSeq = 1
 
+const getAccessiblePatientIds = (user) => {
+  if (user.role !== 'patient') {
+    return []
+  }
+
+  const ids = new Set()
+  if (user.patientId) {
+    ids.add(user.patientId)
+  }
+  if (user.id) {
+    ids.add(`TEMP-${user.id}`)
+  }
+
+  return Array.from(ids)
+}
+
 const listUserConversations = (user) => {
   if (user.role === 'doctor') {
     return conversations.filter((item) => item.doctorName === user.name)
   }
 
   if (user.role === 'patient') {
-    return conversations.filter((item) => item.patientId === user.patientId)
+    const patientIds = getAccessiblePatientIds(user)
+    return conversations.filter((item) => patientIds.includes(item.patientId))
   }
 
   return []
@@ -29,7 +46,7 @@ const canAccessConversation = (user, conversation) => {
   }
 
   if (user.role === 'patient') {
-    return conversation.patientId === user.patientId
+    return getAccessiblePatientIds(user).includes(conversation.patientId)
   }
 
   return false

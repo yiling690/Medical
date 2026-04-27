@@ -83,9 +83,27 @@ const pool = {
     }
 
     if (sql.includes('SELECT') && sql.includes('FROM user')) {
-      const username = params[0];
-      const role = params[1];
-      const users = data.user.filter(u => u.username === username && (!role || u.role === role));
+      let users = data.user;
+
+      if (sql.includes('WHERE username = ?')) {
+        const username = params[0];
+        users = users.filter((u) => u.username === username);
+        if (sql.includes('AND role = ?')) {
+          const role = params[1];
+          users = users.filter((u) => u.role === role);
+        }
+      } else if (sql.includes('WHERE id = ?')) {
+        const id = params[0];
+        users = users.filter((u) => Number(u.id) === Number(id));
+      }
+
+      if (sql.includes('patient_id AS patientId')) {
+        return [users.map((u) => ({
+          ...u,
+          patientId: u.patient_id ?? null,
+        }))];
+      }
+
       return [users];
     }
 
