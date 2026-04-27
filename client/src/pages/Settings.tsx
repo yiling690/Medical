@@ -15,7 +15,7 @@ function SettingsPage(): React.ReactElement {
         </Text>
       </div>
 
-      <Card bordered={false} className="settings-card">
+      <Card variant="borderless" className="settings-card">
         <Tabs
           defaultActiveKey="profile"
           items={[

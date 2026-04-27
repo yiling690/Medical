@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Button, Card, Col, Input, List, Row, Typography } from 'antd'
+import { Button, Card, Col, Flex, Input, Row, Typography } from 'antd'
 import { useNavigate } from 'react-router-dom'
 import './appointment-doctors.less'
 
@@ -109,21 +109,26 @@ function AppointmentDoctorsPage(): React.ReactElement {
         <Col span={6}>
           <Card className="appointment-dept-card" bordered>
             <div className="appointment-dept-title">选择科室</div>
-            <List
-              dataSource={departments}
-              renderItem={(item) => (
-                <List.Item
+            <Flex vertical className="appointment-dept-list">
+              {departments.map((item) => (
+                <div
+                  key={item.key}
                   className={
                     item.key === activeDept
                       ? 'appointment-dept-item appointment-dept-item-active'
                       : 'appointment-dept-item'
                   }
                   onClick={() => setActiveDept(item.key)}
+                  style={{
+                    padding: '12px 16px',
+                    cursor: 'pointer',
+                    borderBottom: '1px solid #f0f0f0',
+                  }}
                 >
                   {item.label}
-                </List.Item>
-              )}
-            />
+                </div>
+              ))}
+            </Flex>
           </Card>
         </Col>
         <Col span={18}>
@@ -154,7 +159,11 @@ function AppointmentDoctorsPage(): React.ReactElement {
                       <Button
                         type="primary"
                         key="schedule"
-                        onClick={() => navigate('/appointment/schedule')}
+                        onClick={() =>
+                          navigate('/appointment/schedule', {
+                            state: { doctor },
+                          })
+                        }
                       >
                         查看日程
                       </Button>,

@@ -1,0 +1,32 @@
+{
+  "user": [
+    {
+      "id": 1,
+      "username": "doctor01",
+      "password": "123456",
+      "role": "doctor",
+      "name": "王医生",
+      "patient_id": null
+    },
+    {
+      "id": 2,
+      "username": "patient01",
+      "password": "123456",
+      "role": "patient",
+      "name": "张三",
+      "patient_id": "P-202300123"
+    }
+  ],
+  "patient": [
+    {
+      "id": 1,
+      "patient_no": "P-202300123",
+      "name": "张三",
+      "gender": "男",
+      "age": 30,
+      "phone": "13800138000"
+    }
+  ],
+  "medical_record": [],
+  "audit_log": []
+}

@@ -8,6 +8,8 @@
 
 .doctor-patient-list-card {
   height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .doctor-patient-list-header {
@@ -29,6 +31,15 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
+}
+
+.doctor-patient-list-card .ant-list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.doctor-patient-list-item-active {
+  background-color: #f0f5ff;
 }
 
 .doctor-patient-list-name {
@@ -68,3 +79,71 @@
   font-size: 12px;
 }
 
+.doctor-patient-chat-panel {
+  border: 1px solid #f0f0f0;
+  border-radius: 12px;
+  background: #fafafa;
+  overflow: hidden;
+}
+
+.doctor-patient-chat-list {
+  min-height: 360px;
+  max-height: 420px;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.doctor-patient-chat-empty {
+  color: #86909c;
+  text-align: center;
+  padding: 48px 0;
+}
+
+.doctor-patient-chat-item {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.doctor-patient-chat-item-self {
+  justify-content: flex-end;
+}
+
+.doctor-patient-chat-bubble {
+  max-width: 70%;
+  background: #fff;
+  border-radius: 12px;
+  padding: 12px 14px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+}
+
+.doctor-patient-chat-item-self .doctor-patient-chat-bubble {
+  background: #e6f4ff;
+}
+
+.doctor-patient-chat-role {
+  font-size: 12px;
+  color: #86909c;
+  margin-bottom: 6px;
+}
+
+.doctor-patient-chat-time {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #86909c;
+  text-align: right;
+}
+
+.doctor-patient-chat-editor {
+  border-top: 1px solid #f0f0f0;
+  background: #fff;
+  padding: 16px;
+}
+
+.doctor-patient-chat-actions {
+  margin-top: 12px;
+  display: flex;
+  justify-content: flex-end;
+}

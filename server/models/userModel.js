@@ -12,11 +12,10 @@ const users = [
     username: 'doctor01',
     password: '123456',
     role: 'doctor',
-    name: '李明医生',
+    name: '王医生',
   },
 ]
 
 module.exports = {
   users,
 }
-

@@ -70,8 +70,8 @@ function PatientRecordsPage(): React.ReactElement {
 
       <Card
         className="patient-records-filters"
-        bodyStyle={{ paddingBottom: 8 }}
-        bordered={false}
+          styles={{ body: { paddingBottom: 8 } }}
+          variant="borderless"
       >
         <Space
           style={{ width: '100%', justifyContent: 'space-between' }}
@@ -118,7 +118,7 @@ function PatientRecordsPage(): React.ReactElement {
                   <Text type="secondary">{record.date}</Text>
                 </div>
               }
-              bordered={false}
+              variant="borderless"
               actions={[
                 <Button
                   type="link"

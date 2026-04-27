@@ -90,7 +90,7 @@ function AppointmentPage(): React.ReactElement {
         </div>
       </div>
 
-      <Card className="appointment-steps" bordered={false}>
+      <Card className="appointment-steps" variant="borderless">
         <Steps
           current={0}
           items={[
@@ -101,7 +101,7 @@ function AppointmentPage(): React.ReactElement {
         />
       </Card>
 
-      <Card className="appointment-filters" bordered={false}>
+      <Card className="appointment-filters" variant="borderless">
         <Space style={{ width: '100%' }} wrap>
           <Input.Search
             placeholder="搜索医院名称、专科等..."
@@ -136,7 +136,7 @@ function AppointmentPage(): React.ReactElement {
           <Col key={item.id} xs={24} sm={12} md={8}>
             <Card
               className="appointment-hospital-card"
-              bordered={false}
+              variant="borderless"
               title={
                 <div className="appointment-hospital-card-header">
                   <span>{item.name}</span>

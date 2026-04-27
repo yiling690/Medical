@@ -64,7 +64,7 @@ function RecordDetailPage(): React.ReactElement | null {
         <Button type="primary">预约医生</Button>
       </div>
 
-      <Card loading={loading} bordered={false} className="record-detail-card">
+      <Card loading={loading} variant="borderless" className="record-detail-card">
         <Descriptions title="患者信息" column={2} bordered>
           <Descriptions.Item label="姓名">
             {record.patientName}

@@ -5,6 +5,10 @@ import PatientRecordsPage from '../pages/PatientRecords'
 import RecordDetailPage from '../pages/RecordDetail'
 import AppointmentPage from '../pages/Appointment'
 import AppointmentDoctorsPage from '../pages/AppointmentDoctors'
+import AppointmentSchedulePage from '../pages/AppointmentSchedule'
+import AppointmentRecordsPage from '../pages/AppointmentRecords'
+import InspectionOrderDetailPage from '../pages/InspectionOrderDetail'
+import PatientChatPage from '../pages/PatientChat'
 import DoctorSchedulePage from '../pages/DoctorSchedule'
 import SettingsPage from '../pages/Settings'
 import DoctorPatientManagePage from '../pages/DoctorPatientManage'
@@ -124,7 +128,37 @@ const router = createBrowserRouter([
     element: (
       <RequireAuth>
         <MainLayout>
-          <DoctorSchedulePage />
+          <AppointmentSchedulePage />
+        </MainLayout>
+      </RequireAuth>
+    ),
+  },
+  {
+    path: '/appointment/records',
+    element: (
+      <RequireAuth>
+        <MainLayout>
+          <AppointmentRecordsPage />
+        </MainLayout>
+      </RequireAuth>
+    ),
+  },
+  {
+    path: '/appointment/orders/:id',
+    element: (
+      <RequireAuth>
+        <MainLayout>
+          <InspectionOrderDetailPage />
+        </MainLayout>
+      </RequireAuth>
+    ),
+  },
+  {
+    path: '/chat',
+    element: (
+      <RequireAuth>
+        <MainLayout>
+          <PatientChatPage />
         </MainLayout>
       </RequireAuth>
     ),

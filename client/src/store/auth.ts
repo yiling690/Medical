@@ -50,12 +50,11 @@ const useAuthStore = create<AuthState>((set) => ({
       return next
     }),
   logout: () =>
-    set(() => {
+    set((prev) => {
       const next = { token: null, user: null } as Pick<AuthState, 'token' | 'user'>
       saveState(next)
-      return { ...next, login: () => {}, logout: () => {} } as AuthState
+      return { ...prev, ...next }
     }),
 }))
 
 export default useAuthStore
-

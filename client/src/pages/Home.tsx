@@ -17,7 +17,7 @@ function HomePage(): React.ReactElement {
 
   return (
     <div className="home-page">
-      <Card className="home-main-card" bordered={false}>
+      <Card className="home-main-card" variant="borderless">
         <div className="home-main-content">
           <div className="home-avatar-large" />
           <div className="home-main-text">
@@ -38,6 +38,16 @@ function HomePage(): React.ReactElement {
               >
                 <div className="home-quick-title">我的病历</div>
                 <Text type="secondary">查看和管理历史就诊记录。</Text>
+              </Card>
+            </Col>
+            <Col xs={24} sm={8}>
+              <Card
+                className="home-quick-card"
+                hoverable
+                onClick={() => navigate('/appointment/records')}
+              >
+                <div className="home-quick-title">预约记录</div>
+                <Text type="secondary">查看历史预约及支付记录。</Text>
               </Card>
             </Col>
             <Col xs={24} sm={8}>
@@ -74,4 +84,3 @@ function HomePage(): React.ReactElement {
 }
 
 export default HomePage
-
